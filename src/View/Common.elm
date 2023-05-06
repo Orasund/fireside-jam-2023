@@ -19,22 +19,36 @@ options onClick list =
     list
         |> List.map
             (\text ->
-                Layout.textButton []
-                    { onPress = onClick text |> Just
-                    , label = text
-                    }
+                chipButton (onClick text) text
             )
         |> Html.div
             [ Html.Attributes.style "display" "inline-flex"
-            , View.Style.smallGap
+            , Html.Attributes.style "flex-flow" "wrap"
+            , View.Style.tinyGap
             ]
 
 
-placeholder : Html msg
-placeholder =
-    Html.div
-        [ View.Style.placeholderBackground
+chipButton : msg -> String -> Html msg
+chipButton onPress label =
+    Layout.textButton
+        [ View.Style.buttonBackground
+        , View.Style.smallPadding
         , View.Style.bordersRounded
-        , Html.Attributes.style "display" "inline-box"
+        , View.Style.noBorder
         ]
-        []
+        { onPress = Just onPress
+        , label = label
+        }
+
+
+boxButton : msg -> String -> Html msg
+boxButton onPress label =
+    Layout.textButton
+        [ View.Style.buttonBackground
+        , View.Style.smallPadding
+        , View.Style.bordersRounded
+        , View.Style.noBorder
+        ]
+        { onPress = Just onPress
+        , label = label
+        }

@@ -53,10 +53,10 @@ fromChapter chapter =
                     , choose
                         [ ( "be a "
                           , [ themedEnum
-                                [ ( "good", [ Domestic ] )
+                                [ ( "good", [ Cute ] )
                                 , ( "bad", [ Dangerous, Wild ] )
-                                , ( "cute", [ Friendly ] )
-                                , ( "funny", [ Friendly ] )
+                                , ( "cute", [ Cute ] )
+                                , ( "funny", [ Funny ] )
                                 ]
                                 |> withText " cat"
                             ]
@@ -64,7 +64,7 @@ fromChapter chapter =
                         , ( "catch "
                           , [ themedEnum
                                 [ ( "fish", [ Wild ] )
-                                , ( "mice", [ Domestic ] )
+                                , ( "mice", [ Funny ] )
                                 , ( "birds", [ Wild ] )
                                 ]
                             ]
@@ -81,8 +81,14 @@ fromChapter chapter =
                                 ]
                             ]
                           )
-                        , ( "with only one paw", [] )
-                        , ( "and look stunning doing so", [] )
+                        , ( "as "
+                          , [ enum
+                                [ "an human"
+                                , "a group"
+                                , "a dog"
+                                ]
+                            ]
+                          )
                         ]
                     ]
 
@@ -90,13 +96,13 @@ fromChapter chapter =
                     [ choose
                         [ ( "your "
                           , [ themedEnum
-                                [ ( "friendly", [ Domestic, Friendly ] )
+                                [ ( "friendly", [ Cute, Funny ] )
                                 , ( "naughty", [ Dangerous, Wild ] )
                                 ]
                             , Text " "
                             , themedEnum
                                 [ ( "neighborhood cat", [ Dangerous ] )
-                                , ( "house cat", [ Domestic ] )
+                                , ( "house cat", [ Funny ] )
                                 , ( "wild cat", [ Wild ] )
                                 ]
                             ]
@@ -107,10 +113,10 @@ fromChapter chapter =
                                 , ( "real", [] )
                                 , ( "teenage", [ Dangerous ] )
                                 , ( "unsure", [ Wild ] )
-                                , ( "small", [ Friendly ] )
+                                , ( "small", [ Funny ] )
                                 , ( "big", [] )
                                 ]
-                            , Text " human"
+                                |> withText " human"
                             ]
                           )
                         ]

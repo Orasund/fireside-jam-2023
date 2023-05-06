@@ -4,11 +4,14 @@ import Browser
 import Chapter exposing (Chapter)
 import Dict exposing (Dict)
 import Html exposing (Html)
+import Html.Attributes
 import Layout
 import Semantics exposing (Semantics(..))
 import Theme exposing (Theme, ThemeId)
 import View.Common
 import View.Page
+import View.Review
+import View.Style
 
 
 type alias Content =
@@ -51,34 +54,43 @@ view : Model -> Html Msg
 view model =
     if model.finished then
         [ Html.text "Reviews" |> Layout.heading1 []
-        , View.Page.result model.scores
-        , Layout.textButton
-            []
-            { onPress = Restart |> Just
-            , label = "Restart"
-            }
+        , Theme.values
+            |> List.filterMap
+                (\theme ->
+                    model.scores
+                        |> Dict.get (Theme.toString theme)
+                        |> Maybe.map
+                            (\score ->
+                                View.Review.fromTheme score theme
+                            )
+                )
+            |> Layout.column
+                [ View.Style.gap
+                , Html.Attributes.style "width" "100%"
+                ]
+        , Theme.values
+            |> List.filterMap
+                (\theme ->
+                    model.scores
+                        |> Dict.get (Theme.toString theme)
+                        |> Maybe.map (Tuple.pair theme)
+                )
+            |> View.Page.result
+        , View.Common.boxButton Restart "Restart"
         ]
             |> View.Page.toHtml
 
     else
         [ model.chapter
-            |> View.Page.fromChapter
-                (\args ->
-                    View.Common.options
-                        (\option -> PickOption { label = args.label, option = option })
-                        args.options
-                )
+            |> View.Page.fromChapter PickOption
                 (model.content
                     |> Dict.map
-                        (\_ { text, options } ->
-                            ( text, options |> Dict.keys )
+                        (\_ { text, options, themes } ->
+                            ( text, options |> Dict.keys, themes )
                         )
                 )
         , if model.content |> Dict.values |> List.all (\{ options } -> Dict.isEmpty options) then
-            Layout.textButton []
-                { onPress = NextPage |> Just
-                , label = "Next Page"
-                }
+            View.Common.boxButton NextPage "Next Page"
 
           else
             Layout.text [] "Finish the sentences."

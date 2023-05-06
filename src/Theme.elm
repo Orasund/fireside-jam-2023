@@ -7,10 +7,14 @@ type alias ThemeId =
 
 type Theme
     = Wild
-    | Domestic
-    | Friendly
+    | Funny
     | Dangerous
     | Cute
+
+
+values : List Theme
+values =
+    [ Wild, Funny, Dangerous, Cute ]
 
 
 toString : Theme -> ThemeId
@@ -19,14 +23,27 @@ toString theme =
         Wild ->
             "Wild"
 
-        Domestic ->
-            "Domestic"
-
-        Friendly ->
-            "Friendly"
+        Funny ->
+            "Funny"
 
         Dangerous ->
             "Dangerous"
 
         Cute ->
             "Cute"
+
+
+toEmoji : Theme -> String
+toEmoji theme =
+    case theme of
+        Wild ->
+            "😼"
+
+        Funny ->
+            "😹"
+
+        Dangerous ->
+            "🙀"
+
+        Cute ->
+            "😻"

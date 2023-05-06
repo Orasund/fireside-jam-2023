@@ -24,7 +24,10 @@ options onClick list =
                     , label = text
                     }
             )
-        |> Layout.row [ View.Style.gap ]
+        |> Html.div
+            [ Html.Attributes.style "display" "inline-flex"
+            , View.Style.smallGap
+            ]
 
 
 placeholder : Html msg

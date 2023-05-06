@@ -2,11 +2,45 @@ module Semantics exposing (..)
 
 import Chapter exposing (Chapter)
 import Dict exposing (Dict)
+import Theme exposing (Theme(..))
 
 
 type Semantics
     = Text String
-    | Choose (List ( String, List Semantics ))
+    | Choose (List ( String, List Semantics, List Theme ))
+
+
+choose : List ( String, List Semantics ) -> Semantics
+choose list =
+    list
+        |> List.map (\( label, semantics ) -> ( label, semantics, [] ))
+        |> Choose
+
+
+enum : List String -> Semantics
+enum list =
+    list
+        |> List.map (\label -> ( label, [], [] ))
+        |> Choose
+
+
+themedEnum : List ( String, List Theme ) -> Semantics
+themedEnum list =
+    list
+        |> List.map (\( label, themes ) -> ( label, [], themes ))
+        |> Choose
+
+
+withText : String -> Semantics -> Semantics
+withText text semantics =
+    case semantics of
+        Text text2 ->
+            text2 ++ text |> Text
+
+        Choose list ->
+            list
+                |> List.map (\( label, content, themes ) -> ( label ++ text, content, themes ))
+                |> Choose
 
 
 fromChapter : Chapter -> Dict String (List Semantics)
@@ -16,34 +50,34 @@ fromChapter chapter =
             let
                 title =
                     [ Text "How to "
-                    , Choose
+                    , choose
                         [ ( "be a "
-                          , [ Choose
-                                [ ( "good", [] )
-                                , ( "bad", [] )
-                                , ( "cute", [] )
-                                , ( "funny", [] )
+                          , [ themedEnum
+                                [ ( "good", [ Domestic ] )
+                                , ( "bad", [ Dangerous, Wild ] )
+                                , ( "cute", [ Friendly ] )
+                                , ( "funny", [ Friendly ] )
                                 ]
-                            , Text " cat"
+                                |> withText " cat"
                             ]
                           )
                         , ( "catch "
-                          , [ Choose
-                                [ ( "fish", [] )
-                                , ( "mice", [] )
-                                , ( "birds", [] )
+                          , [ themedEnum
+                                [ ( "fish", [ Wild ] )
+                                , ( "mice", [ Domestic ] )
+                                , ( "birds", [ Wild ] )
                                 ]
                             ]
                           )
                         , ( "do nothing", [] )
                         ]
                     , Text " "
-                    , Choose
+                    , choose
                         [ ( "without "
-                          , [ Choose
-                                [ ( "trying", [] )
-                                , ( "loosing a sweat", [] )
-                                , ( "looking", [] )
+                          , [ enum
+                                [ "trying"
+                                , "loosing a sweat"
+                                , "looking"
                                 ]
                             ]
                           )
@@ -53,15 +87,27 @@ fromChapter chapter =
                     ]
 
                 author =
-                    [ Choose
-                        [ ( "your friendly neighbor", [] )
+                    [ choose
+                        [ ( "your "
+                          , [ themedEnum
+                                [ ( "friendly", [ Domestic, Friendly ] )
+                                , ( "naughty", [ Dangerous, Wild ] )
+                                ]
+                            , Text " "
+                            , themedEnum
+                                [ ( "neighborhood cat", [ Dangerous ] )
+                                , ( "house cat", [ Domestic ] )
+                                , ( "wild cat", [ Wild ] )
+                                ]
+                            ]
+                          )
                         , ( "the owner of a "
-                          , [ Choose
-                                [ ( "witch", [] )
+                          , [ themedEnum
+                                [ ( "witch", [ Wild, Dangerous ] )
                                 , ( "real", [] )
-                                , ( "teenage", [] )
-                                , ( "unsure", [] )
-                                , ( "small", [] )
+                                , ( "teenage", [ Dangerous ] )
+                                , ( "unsure", [ Wild ] )
+                                , ( "small", [ Friendly ] )
                                 , ( "big", [] )
                                 ]
                             , Text " human"

@@ -5,7 +5,9 @@ import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes
 import Layout
+import Theme exposing (ThemeId)
 import View.Common
+import View.Style
 
 
 fromChapter : ({ label : String, options : List String } -> Html msg) -> Dict String ( String, List String ) -> Chapter -> Html msg
@@ -39,12 +41,30 @@ fromChapter viewOptions dict chapter =
                 |> Layout.column []
 
 
+result : Dict ThemeId Int -> Html msg
+result scores =
+    scores
+        |> Dict.toList
+        |> List.map
+            (\( themeId, score ) ->
+                [ themeId |> Layout.text []
+                , score |> String.fromInt |> Layout.text []
+                ]
+                    |> Layout.row [ Layout.contentWithSpaceBetween ]
+            )
+        |> Layout.column
+            [ Html.Attributes.style "width" "100%"
+            ]
+
+
 toHtml : List (Html msg) -> Html msg
 toHtml content =
     content
         |> Layout.column
-            ([ Html.Attributes.style "height" "100%"
-             , Html.Attributes.style "width" "100%"
-             ]
-                ++ Layout.centered
-            )
+            [ Html.Attributes.style "height" "600px"
+            , Html.Attributes.style "width" "400px"
+            , View.Style.padding
+            , Layout.contentWithSpaceBetween
+            , Layout.alignAtCenter
+            ]
+        |> Layout.el Layout.centered

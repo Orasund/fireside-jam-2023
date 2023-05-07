@@ -40,7 +40,11 @@ titleChapter : Dict String (List Semantics)
 titleChapter =
     let
         title =
-            [ Text "How to "
+            [ enum
+                [ ( "How to ", [] )
+                , ( "Ten ways to ", [] )
+                , ( "Guide to ", [] )
+                ]
             , choose
                 [ ( "be a "
                   , [ enum
@@ -70,14 +74,14 @@ titleChapter =
                     ]
                   )
                 ]
-            , Text " "
             , choose
-                [ ( "without "
+                [ ( " without "
                   , [ enum
                         [ ( "help", [ Cute ] )
                         , ( "trying", [ Funny ] )
                         , ( "loosing a sweat", [ Dangerous ] )
                         ]
+                        |> withText "."
                     ]
                   )
                 , ( ".", [] )
@@ -160,6 +164,7 @@ quoteChapter =
                   , [ enum [ ( "and the day is yours", [ Dangerous, Wild ] ) ] ]
                   )
                 ]
+            , Text "."
             ]
 
         author =
@@ -220,6 +225,7 @@ rulesChapter =
                 , ( "you had a nap", [ Cute ] )
                 , ( "you played with your human", [ Cute ] )
                 ]
+                |> withText "."
             ]
 
         second =
@@ -237,6 +243,7 @@ rulesChapter =
                 , ( ".", [ Dangerous ] )
                 , ( " that hasn't cuddles with you", [ Cute ] )
                 ]
+                |> withText "."
             ]
 
         third =
@@ -258,6 +265,7 @@ rulesChapter =
                 , ( "another cat gives to you", [ Dangerous ] )
                 , ( "you had not smelled before", [ Funny ] )
                 ]
+                |> withText "."
             ]
     in
     [ ( "1.", first )

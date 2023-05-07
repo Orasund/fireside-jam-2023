@@ -2,48 +2,65 @@ module View.Page exposing (..)
 
 import Chapter exposing (Chapter(..))
 import Dict exposing (Dict)
-import Html exposing (Html)
+import Html exposing (Attribute, Html)
 import Html.Attributes
+import Html.Events
 import Layout
 import Theme exposing (Theme)
 import View.Common
 import View.Style
 
 
-fromChapter : ({ label : String, option : String } -> msg) -> Dict String ( String, List ( String, Bool ), List Theme ) -> Chapter -> Html msg
-fromChapter onClick dict chapter =
+fromChapter :
+    { onClick : { label : String, option : String } -> msg
+    , showCredits : msg
+    }
+    -> Dict String ( String, List ( String, Bool ), List Theme )
+    -> Chapter
+    -> Html msg
+fromChapter args dict chapter =
     case chapter of
         Title ->
-            [ viewContent
+            [ viewContent []
                 { label = "Title"
-                , onClick = onClick
+                , onClick = args.onClick
                 , content = dict
                 }
                 (Html.h1 [])
             , [ Layout.text [ Layout.contentCentered ] "by"
-              , viewContent
+              , viewContent []
                     { label = "Author"
-                    , onClick = onClick
+                    , onClick = args.onClick
                     , content = dict
                     }
                     (Layout.row [ Layout.contentCentered ])
               ]
                 |> Layout.column [ View.Style.smallGap, Html.Attributes.style "width" "100%" ]
-            , "A game by Lucas Payr"
-                |> Layout.text [ Html.Attributes.style "font-size" "0.5em" ]
+            , [ Html.text "A game by Lucas Payr (Orasund)"
+              , Html.text "Credits" |> Layout.linkTo [ Html.Events.onClick args.showCredits ] "#"
+              ]
+                |> Layout.row
+                    [ Html.Attributes.style "font-size" "0.75em"
+                    , View.Style.padding
+                    , View.Style.gap
+                    ]
             ]
-                |> Layout.column [ Layout.alignAtCenter, View.Style.gap ]
+                |> Layout.column
+                    [ Layout.alignAtCenter
+                    , Layout.contentWithSpaceBetween
+                    , Layout.fill
+                    ]
 
         Quote ->
-            [ viewContent
+            [ viewContent []
                 { label = "Quote"
-                , onClick = onClick
+                , onClick = args.onClick
                 , content = dict
                 }
                 (Html.h2 [])
-            , viewContent
+            , viewContent []
                 { label = "Author"
-                , onClick = onClick
+                , onClick = args.onClick
                 , content = dict
                 }
                 (\list ->
@@ -56,27 +73,24 @@ fromChapter onClick dict chapter =
 
         Rules ->
             [ Html.text "The golden rules" |> Layout.heading3 []
-            , [ viewContent
+            , [ viewContent [ Layout.fill ]
                     { label = "1."
-                    , onClick = onClick
+                    , onClick = args.onClick
                     , content = dict
                     }
                     (Layout.row [ Layout.alignAtBaseline, Html.Attributes.style "width" "100%" ])
-                    |> Layout.el [ Layout.fill ]
-              , viewContent
+              , viewContent [ Layout.fill ]
                     { label = "2."
-                    , onClick = onClick
+                    , onClick = args.onClick
                     , content = dict
                     }
                     (Layout.row [ Layout.alignAtBaseline, Html.Attributes.style "width" "100%" ])
-                    |> Layout.el [ Layout.fill ]
-              , viewContent
+              , viewContent [ Layout.fill ]
                     { label = "3."
-                    , onClick = onClick
+                    , onClick = args.onClick
                     , content = dict
                     }
                     (Layout.row [ Layout.alignAtBaseline, Html.Attributes.style "width" "100%" ])
-                    |> Layout.el [ Layout.fill ]
               ]
                 |> Layout.column
                     [ View.Style.bigGap
@@ -87,13 +101,15 @@ fromChapter onClick dict chapter =
 
 
 viewContent :
-    { label : String
-    , onClick : { label : String, option : String } -> msg
-    , content : Dict String ( String, List ( String, Bool ), List Theme )
-    }
+    List (Attribute msg)
+    ->
+        { label : String
+        , onClick : { label : String, option : String } -> msg
+        , content : Dict String ( String, List ( String, Bool ), List Theme )
+        }
     -> (List (Html msg) -> Html msg)
     -> Html msg
-viewContent args fun =
+viewContent attrs args fun =
     (case args.content |> Dict.get args.label of
         Just ( content, [], themes ) ->
             ( [ Html.text content ], themes )
@@ -115,23 +131,18 @@ viewContent args fun =
     )
         |> (\( content, themes ) ->
                 fun content
-                    |> Layout.el
-                        ([ Html.Attributes.style "width" "100%"
-                         ]
-                            ++ View.Style.bigPaddingX
-                        )
-                    |> Layout.withStack [ Html.Attributes.style "width" "100%" ]
-                        [ \attrs ->
+                    |> Layout.withStack (attrs ++ View.Style.bigPaddingX)
+                        [ \a ->
                             themes
                                 |> List.map Theme.toEmoji
                                 |> List.map (Layout.text [])
                                 |> Layout.column
                                     ([ Html.Attributes.style "right" "0"
-                                     , Html.Attributes.style "top" "50%"
+                                     , Html.Attributes.style "top" "0"
                                      , Html.Attributes.style "font-size" "1.5em"
                                      , View.Style.tinyGap
                                      ]
-                                        ++ attrs
+                                        ++ a
                                     )
                         ]
            )

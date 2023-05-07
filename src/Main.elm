@@ -6,6 +6,7 @@ import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes
 import Layout
+import Maybe
 import Semantics exposing (Semantics(..))
 import Theme exposing (Theme, ThemeId)
 import View.Common
@@ -34,6 +35,7 @@ type alias Model =
     , remainingChapters : List Chapter
     , scores : Dict ThemeId Int
     , finished : Bool
+    , showCredits : Bool
     }
 
 
@@ -41,6 +43,8 @@ type Msg
     = Restart
     | NextPage
     | PickOption { label : String, option : String }
+    | SetVolume Float
+    | ToggleShowingCredits
 
 
 init : () -> ( Model, Cmd Msg )
@@ -50,6 +54,7 @@ init () =
       , remainingChapters = Chapter.values
       , scores = Dict.empty
       , finished = False
+      , showCredits = False
       }
         |> nextPage
     , Cmd.none
@@ -58,7 +63,15 @@ init () =
 
 view : Model -> Html Msg
 view model =
-    if model.finished then
+    if model.showCredits then
+        [ Html.text "Credits" |> Layout.heading1 []
+        , Html.text "Noto Emoji Font by Google"
+            |> Layout.linkToNewTab [] "https://fonts.google.com/noto/specimen/Noto+Color+Emoji"
+        , View.Common.boxButton ToggleShowingCredits "Back"
+        ]
+            |> View.Page.toHtml
+
+    else if model.finished then
         [ Html.text "Reviews" |> Layout.heading1 []
         , Theme.values
             |> List.filterMap
@@ -88,7 +101,10 @@ view model =
 
     else
         [ model.chapter
-            |> View.Page.fromChapter PickOption
+            |> View.Page.fromChapter
+                { onClick = PickOption
+                , showCredits = ToggleShowingCredits
+                }
                 (model.content
                     |> Dict.map
                         (\_ { text, options, themes } ->
@@ -190,7 +206,7 @@ normalizeContent content =
             content
 
 
-pickOption : { label : String, option : String } -> Model -> Model
+pickOption : { label : String, option : String } -> Model -> ( Model, Cmd msg )
 pickOption args model =
     let
         updateContent content =
@@ -206,25 +222,43 @@ pickOption args model =
                 Nothing ->
                     content
     in
-    { model
-        | content =
-            model.content
-                |> Dict.update args.label
-                    (Maybe.map updateContent)
-    }
+    model.content
+        |> Dict.get args.label
+        |> Maybe.map updateContent
+        |> Maybe.map
+            (\content ->
+                ( { model
+                    | content = Dict.insert args.label content model.content
+                  }
+                , if content.options |> Dict.isEmpty then
+                    playSound "cat"
+
+                  else
+                    Cmd.none
+                )
+            )
+        |> Maybe.withDefault ( model, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NextPage ->
-            ( nextPage model, playSound "cat" )
+            ( nextPage model, playSound "curiousCat" )
 
         PickOption args ->
-            ( pickOption args model, playSound "buttonUp" )
+            pickOption args model
+                |> Tuple.mapSecond (\cmd -> Cmd.batch [ cmd, playSound "buttonUp" ])
 
         Restart ->
             init ()
+                |> Tuple.mapSecond (\cmd -> Cmd.batch [ cmd, playSound "curiousCat" ])
+
+        SetVolume amount ->
+            ( model, setVolume amount )
+
+        ToggleShowingCredits ->
+            ( { model | showCredits = not model.showCredits }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

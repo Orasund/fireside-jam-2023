@@ -2,20 +2,20 @@
 
 <head>
     <script src="assets/howler.js"></script>
+    <script src="main.js"></script>
 </head>
 
 <body>
     <main></main>
     <script>
-        import { Howl, Howler } from 'howler';
-
         const newHowl = (source) => new Howl({ src: [source] })
 
         // Setup the new Howl.
         const sounds = {
-            cat: newHowl('cat.mp3'),
-            buttonUp: newHowl('buttonUp.mp3'),
-            buttonDown: newHowl('buttonDown.mp3')
+            cat: newHowl('assets/sounds/cat.mp3'),
+            buttonUp: newHowl('assets/sounds/buttonUp.mp3'),
+            buttonDown: newHowl('assets/sounds/buttonDown.mp3'),
+            curiousCat: newHowl('assets/sounds/curiousCat.mp3')
         };
 
         var app = Elm.Main.init({ node: document.querySelector('main') })

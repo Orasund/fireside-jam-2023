@@ -41,7 +41,7 @@ init : () -> ( Model, Cmd Msg )
 init () =
     ( { chapter = Chapter.Title
       , content = Dict.empty
-      , remainingChapters = [ Chapter.Title ]
+      , remainingChapters = Chapter.values
       , scores = Dict.empty
       , finished = False
       }
@@ -86,7 +86,15 @@ view model =
                 (model.content
                     |> Dict.map
                         (\_ { text, options, themes } ->
-                            ( text, options |> Dict.keys, themes )
+                            ( text
+                            , options
+                                |> Dict.map
+                                    (\_ ( semantics, _ ) ->
+                                        semantics /= []
+                                    )
+                                |> Dict.toList
+                            , themes
+                            )
                         )
                 )
         , if model.content |> Dict.values |> List.all (\{ options } -> Dict.isEmpty options) then

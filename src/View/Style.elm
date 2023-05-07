@@ -49,6 +49,11 @@ gap =
     Html.Attributes.style "gap" "1em"
 
 
+bigGap : Attribute msg
+bigGap =
+    Html.Attributes.style "gap" "2em"
+
+
 smallPadding : Attribute msg
 smallPadding =
     Html.Attributes.style "padding" "0.5em"
@@ -62,3 +67,10 @@ padding =
 bigPadding : Attribute msg
 bigPadding =
     Html.Attributes.style "padding" "2em"
+
+
+bigPaddingX : List (Attribute msg)
+bigPaddingX =
+    [ Html.Attributes.style "padding-left" "2em"
+    , Html.Attributes.style "padding-right" "2em"
+    ]

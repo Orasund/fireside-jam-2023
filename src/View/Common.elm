@@ -14,12 +14,18 @@ nextPageButton onPress =
         }
 
 
-options : (String -> msg) -> List String -> Html msg
+options : (String -> msg) -> List ( String, Bool ) -> Html msg
 options onClick list =
     list
         |> List.map
-            (\text ->
-                chipButton (onClick text) text
+            (\( text, hasMore ) ->
+                chipButton (onClick text)
+                    (if hasMore then
+                        text ++ "..."
+
+                     else
+                        text
+                    )
             )
         |> Html.div
             [ Html.Attributes.style "display" "inline-flex"

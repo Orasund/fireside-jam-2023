@@ -29,6 +29,8 @@ fromChapter onClick dict chapter =
                     (Layout.row [ Layout.contentCentered ])
               ]
                 |> Layout.column [ View.Style.smallGap, Html.Attributes.style "width" "100%" ]
+            , "A game by Lucas Payr"
+                |> Layout.text [ Html.Attributes.style "font-size" "0.5em" ]
             ]
                 |> Layout.column [ Layout.alignAtCenter, View.Style.gap ]
 

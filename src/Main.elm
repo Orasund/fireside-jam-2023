@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Chapter exposing (Chapter)
@@ -12,6 +12,12 @@ import View.Common
 import View.Page
 import View.Review
 import View.Style
+
+
+port playSound : String -> Cmd msg
+
+
+port setVolume : Float -> Cmd msg
 
 
 type alias Content =
@@ -212,10 +218,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NextPage ->
-            ( nextPage model, Cmd.none )
+            ( nextPage model, playSound "cat" )
 
         PickOption args ->
-            ( pickOption args model, Cmd.none )
+            ( pickOption args model, playSound "buttonUp" )
 
         Restart ->
             init ()
